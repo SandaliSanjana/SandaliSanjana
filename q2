@@ -1,0 +1,32 @@
+from google.colab import drive
+import cv2
+import numpy as np
+from skimage import exposure
+import matplotlib.pyplot as plt
+
+image = cv2.imread('drive/My Drive/Images/image 2.jpg')
+
+lab_image = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
+
+L, a, b = cv2.split(lab_image)
+
+gamma = 0.7  
+L_corrected = exposure.adjust_gamma(L, gamma)
+
+lab_corrected = cv2.merge((L_corrected, a, b))
+
+corrected_image = cv2.cvtColor(lab_corrected, cv2.COLOR_LAB2BGR)
+
+plt.figure(figsize=(10, 5))
+
+plt.subplot(1, 2, 1)
+plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+plt.title('Original Image')
+plt.axis('off')
+
+plt.subplot(1, 2, 2)
+plt.imshow(cv2.cvtColor(corrected_image, cv2.COLOR_BGR2RGB))
+plt.title('Corrected Image (Gamma = {})'.format(gamma))
+plt.axis('off')
+
+plt.show()
