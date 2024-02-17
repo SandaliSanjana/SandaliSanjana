@@ -1,0 +1,23 @@
+import cv2 as cv
+import numpy as np
+import matplotlib.pyplot as plt
+from google.colab import drive
+
+im1=cv.imread('drive/My Drive/Images/image 1.jpg', cv.IMREAD_REDUCED_GRAYSCALE_2)
+assert im1 is not None
+kernel=np.array([[-1,-2,-1],[0,0,0],[1,2,1]],dtype=np.float32)
+hw=kernel.shape[0]//2
+rows,cols=im1.shape[0],im1.shape[1]
+im2=np.zeros(im1.shape,dtype=np.uint8)
+
+for i in range(hw,rows-hw):
+ for j in range(hw,cols-hw):
+     result=im1[i-hw+1,j-hw+1,]*kernel
+     im2[i,j]=np.sum(np.sum(result))
+
+fig,ax =plt.subplots(1,2,figsize=(10,10))
+ax[0].imshow(im1,vmin=0,vmax=235,cmap='gray')
+ax[0].set_title('original')
+ax[1].imshow(im2+128,vmin=0,vmax=255,cmap='gray')
+ax[1].set_title('intensity transformed')
+plt.show()
