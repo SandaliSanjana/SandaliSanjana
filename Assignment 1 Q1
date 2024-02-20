@@ -1,23 +1,25 @@
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
-from google.colab import drive
 
-im1=cv.imread('drive/My Drive/Images/image 1.jpg', cv.IMREAD_REDUCED_GRAYSCALE_2)
-assert im1 is not None
-kernel=np.array([[-1,-2,-1],[0,0,0],[1,2,1]],dtype=np.float32)
-hw=kernel.shape[0]//2
-rows,cols=im1.shape[0],im1.shape[1]
-im2=np.zeros(im1.shape,dtype=np.uint8)
+im1 = cv.imread('D:/Images/margot_golden_gray.jpg')
+assert im is not None
 
-for i in range(hw,rows-hw):
- for j in range(hw,cols-hw):
-     result=im1[i-hw+1,j-hw+1,]*kernel
-     im2[i,j]=np.sum(np.sum(result))
+t = np.zeros(256,dtype=np.uint8)
+t[0:221] = np.array([int(x*200/255) for x in range(221)])
+t[221:256] = np.array([int(x*200/255+40) for x in range(221,256)])
+im2 = t[im1]
 
-fig,ax =plt.subplots(1,2,figsize=(10,10))
-ax[0].imshow(im1,vmin=0,vmax=235,cmap='gray')
-ax[0].set_title('original')
-ax[1].imshow(im2+128,vmin=0,vmax=255,cmap='gray')
-ax[1].set_title('intensity transformed')
+fig,ax = plt.subplots(1,3, figsize = (15,5))
+ax[0].imshow(im1,vmin=0,vmax=255,cmap='gray')
+ax[0].set_title('Original Image')
+
+ax[1].imshow(im2,vmin=0,vmax=255,cmap='gray')
+ax[1].set_title('Intensity Transformed')
+ax[2].plot(t, color='blue')
+ax[2].set_title('(a) Intensity Transformation')
+ax[2].set_xlabel('Input Intensity')
+ax[2].set_ylabel('Output Intensity')
+plt.tight_layout()
 plt.show()
+
