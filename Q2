@@ -1,50 +1,40 @@
-from google.colab import drive
-import cv2
+import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
 
-image_path = '/content/drive/My Drive/Images/image 2.jpg'
+img_orig = cv.imread('D:/Images/highlights_and_shadows.jpg')
+img_lab = cv.cvtColor(img_orig, cv.COLOR_BGR2LAB)
+L, a, b = cv.split(img_lab)
 
-image = cv2.imread(image_path)
+#apply gamma correction
+gamma = 1.5
+table = np.array([(i/255.0)**(gamma)*255.0 for i in np.arange(0, 256)]).astype('uint8')
+L_gamma = cv.LUT(L, table)
 
-lab_image = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
+#gamma and lab merging
+img_lab_gamma = cv.merge([L_gamma, a, b])
+img_gamma = cv.cvtColor(img_lab_gamma, cv.COLOR_LAB2BGR)
 
-L_channel = lab_image[:,:,0]
+fig, axarr = plt.subplots(3, 2)  
+axarr[0, 0].imshow(cv.cvtColor(img_orig, cv.COLOR_BGR2RGB))
+axarr[0, 0].set_title('Original Image')
+axarr[0, 1].imshow(cv.cvtColor(img_gamma, cv.COLOR_BGR2RGB))
+axarr[0, 1].set_title('Gamma Corrected Image')
 
-gamma_value = 0.5  
-gamma_corrected_L = np.power(L_channel / 255.0, gamma_value) * 255.0
-gamma_corrected_L = np.uint8(gamma_corrected_L)
+color = ('b', 'g', 'r')
+for i, c in enumerate(color):
+    hist_orig = cv.calcHist([img_lab], [i], None, [256], [0, 256])
+    axarr[1, 0].plot(hist_orig, color=c )
+    hist_gamma = cv.calcHist([img_lab_gamma], [i], None, [256], [0, 256])
+    axarr[1, 1].plot(hist_gamma, color=c)
 
-lab_image[:,:,0] = gamma_corrected_L
 
-corrected_image = cv2.cvtColor(lab_image, cv2.COLOR_LAB2BGR)
-
-plt.figure(figsize=(12, 6))
-
-plt.subplot(1, 2, 1)
-plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-plt.title('Original Image')
-plt.axis('off')
-
-plt.subplot(1, 2, 2)
-plt.imshow(cv2.cvtColor(corrected_image, cv2.COLOR_BGR2RGB))
-plt.title('Gamma Corrected Image (γ = {})'.format(gamma_value))
-plt.axis('off')
-
-plt.show()
-
-plt.figure(figsize=(12, 6))
-
-plt.subplot(1, 2, 1)
-plt.hist(L_channel.ravel(), bins=256, range=(0, 256), color='blue', alpha=0.6)
-plt.title('Original Image Histogram')
-plt.xlabel('Pixel Value')
-plt.ylabel('Frequency')
-
-plt.subplot(1, 2, 2)
-plt.hist(gamma_corrected_L.ravel(), bins=256, range=(0, 256), color='green', alpha=0.6)
-plt.title('Corrected Image Histogram (γ = {})'.format(gamma_value))
-plt.xlabel('Pixel Value')
-plt.ylabel('Frequency')
+axarr[2, 0].plot(table)
+axarr[2, 0].set_xlim(0, 255)
+axarr[2, 0].set_ylim(0, 255)
+axarr[2, 0].set_aspect('equal')
+axarr[2, 1].axis('off')
+plt.tight_layout()
 
 plt.show()
+
