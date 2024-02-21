@@ -28,7 +28,6 @@ for i, c in enumerate(color):
     hist_gamma = cv.calcHist([img_lab_gamma], [i], None, [256], [0, 256])
     axarr[1, 1].plot(hist_gamma, color=c)
 
-
 axarr[2, 0].plot(table)
 axarr[2, 0].set_xlim(0, 255)
 axarr[2, 0].set_ylim(0, 255)
